@@ -3,27 +3,24 @@ import asyncio
 import os
 import logging
 import time
+import json
 
 # --- Configuration & Logging Setup ---
-# A proper bot should load API keys from secure environment variables.
-API_KEYS = {
-    'binance': {
-        'apiKey': os.getenv('BINANCE_API_KEY'),
-        'secret': os.getenv('BINANCE_API_SECRET'),
-    },
-    'kraken': {
-        'apiKey': os.getenv('KRAKEN_API_KEY'),
-        'secret': os.getenv('KRAKEN_API_SECRET'),
-    },
-}
+# Load configuration from file
+try:
+    with open('exchanges_config.json', 'r') as f:
+        config = json.load(f)
+except FileNotFoundError:
+    logging.error("exchanges_config.json not found. Please create it from exchanges_config.example.json")
+    exit(1)
 
 # Define the trading pairs and the exchanges to monitor.
-SYMBOL = "BTC/USDT"
-EXCHANGES = ['binance', 'kraken']
+EXCHANGES = list(config['exchanges'].keys())
+SYMBOL = config['symbol']
 # Minimum profitable price difference after accounting for all fees.
-MIN_PROFIT_PERCENTAGE = 0.5  # A more realistic threshold for real fees
-TRADE_VOLUME = 0.01  # Volume in the base currency (e.g., 0.01 BTC)
-TRADE_FEE_PERCENTAGE = 0.1 / 100  # Assumes a 0.1% fee on each trade
+MIN_PROFIT_PERCENTAGE = config['min_profit_percentage']
+TRADE_VOLUME = config['trade_volume']
+TRADE_FEE_PERCENTAGE = config['trade_fee_percentage']
 
 # Set up logging for detailed bot activity and debugging
 logging.basicConfig(
@@ -134,8 +131,9 @@ async def main():
     for ex_id in EXCHANGES:
         exchange_class = getattr(ccxt, ex_id)
         exchanges[ex_id] = exchange_class({
-            'apiKey': API_KEYS[ex_id]['apiKey'],
-            'secret': API_KEYS[ex_id]['secret'],
+            'apiKey': config['exchanges'][ex_id]['apiKey'],
+            'secret': config['exchanges'][ex_id]['secret'],
+            'urls': {'api': config['exchanges'][ex_id]['url']},
             'enableRateLimit': True,
         })
     
@@ -160,12 +158,8 @@ async def periodic_check():
 
 
 if __name__ == "__main__":
-    if not all(os.getenv(key) for key in ['BINANCE_API_KEY', 'BINANCE_API_SECRET', 'KRAKEN_API_KEY', 'KRAKEN_API_SECRET']):
-        logging.error("Please set your API keys as environment variables.")
-        print("\n\nTo run this script, set your API keys and secrets as environment variables:")
-        print("export BINANCE_API_KEY='YOUR_BINANCE_API_KEY'")
-        print("export BINANCE_API_SECRET='YOUR_BINANCE_API_SECRET'")
-        print("export KRAKEN_API_KEY='YOUR_KRAKEN_API_KEY'")
-        print("export KRAKEN_API_SECRET='YOUR_KRAKEN_API_SECRET'")
+    if not all(config['exchanges'][ex_id]['apiKey'] and config['exchanges'][ex_id]['secret'] for ex_id in EXCHANGES):
+        logging.error("Please set your API keys in exchanges_config.json")
+        print("Copy exchanges_config.example.json to exchanges_config.json and fill in your API keys and secrets.")
     else:
         asyncio.run(main())
