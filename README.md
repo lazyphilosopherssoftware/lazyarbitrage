@@ -23,15 +23,29 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Set your API keys as environment variables:
+4. Copy the config file and input the correct values:
 ```bash
-export BINANCE_API_KEY='YOUR_BINANCE_API_KEY'
-export BINANCE_API_SECRET='YOUR_BINANCE_API_SECRET'
-export KRAKEN_API_KEY='YOUR_KRAKEN_API_KEY'
-export KRAKEN_API_SECRET='YOUR_KRAKEN_API_SECRET'
+cp config.example.jsonc config.jsonc
+vi config.jsonc
 ```
 
 5. Run the bot:
 ```bash
-python arbitrage.py
+python main.py
 ```
+
+## Testing
+
+Run tests from the test directory:
+```bash
+cd test
+python run_tests.py
+```
+
+See `test/TESTING.md` for detailed testing instructions.
+
+## Features
+
+- Monitors multiple exchanges simultaneously
+- Detects triangular arbitrage opportunities
+- WebSocket and REST API support

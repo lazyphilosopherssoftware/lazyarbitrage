@@ -5,6 +5,8 @@ __pycache__/
 *.pyd
 .Python
 .DS_Store
+.vscode/
+*.swp
 env/
 pip-log.txt
 pip-delete-this-directory.txt
@@ -18,4 +20,4 @@ coverage.xml
 *.log
 .pytest_cache/
 arbitrage_bot.log
-exchanges_config.json
+config.jsonc

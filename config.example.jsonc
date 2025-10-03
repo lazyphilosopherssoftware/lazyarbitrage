@@ -1,0 +1,26 @@
+// config.example.jsonc
+// this is the example configuration file for the arbitrage bot
+// it is JSONC format which allows for comments
+{
+  "exchanges": {  // required
+    "binance": {
+      "apiKey": "YOUR_API_KEY",  // optional, needed for trading
+      "secret": "YOUR_API_SECRET",  // optional, needed for trading
+      "symbols": ["BTC/USDT", "ETH/USDT", "ETH/BTC"],  // required, this is the list of symbols to monitor
+      "poll_interval_seconds": 1.0  // optional, REST API polling interval in seconds (default: 1.0)
+    },
+    "okx": {
+      "apiKey": "YOUR_API_KEY",  // optional, needed for trading
+      "secret": "YOUR_API_SECRET",  // optional, needed for trading
+      "symbols": ["BTC/USDT", "ETH/USDT", "ETH/BTC"],  // required, this is the list of symbols to monitor
+      "poll_interval_seconds": 0.5  // optional, REST API polling interval in seconds (default: 1.0)
+    }
+  },
+  "min_profit_percentage": 0.5,  // required, this should be computed from the fees of the exchanges
+  "testnet": true,  // required, this is testnet mode, not paper trading
+  "max_age_seconds": 1,  // required, maximum age of price data before considered stale (in seconds)
+  "min_volume_usd": {  // required, minimum USD volume required for trading consideration
+    "triangular": 5000,  // minimum volume for triangular arbitrage (within single exchange)
+    "spatial": 10000     // minimum volume for spatial arbitrage (across exchanges)
+  }
+}
